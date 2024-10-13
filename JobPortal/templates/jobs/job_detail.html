@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ job.title }} - Job Details{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #3c42b90e, #7ef4e0);
+    }
+
+    .job-container {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 800px;
+    }
+
+    .job-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+
+    .company-name {
+        font-size: 1.5rem;
+        color: #555;
+    }
+
+    .job-description {
+        margin-top: 20px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px; /* Space between buttons */
+        margin-top: 20px; /* Space above button group */
+    }
+
+    .apply-button, .edit-button, .delete-button, .back-button {
+        display: inline-flex; /* Flexbox for alignment */
+        align-items: center; /* Center icon and text */
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        text-decoration: none; /* Remove underline */
+    }
+
+    .apply-button {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .apply-button:hover {
+        background-color: #45a049;
+    }
+
+    .edit-button {
+        background-color: #FFD700;
+        color: #333;
+    }
+
+    .edit-button:hover {
+        background-color: #FFC300;
+    }
+
+    .delete-button {
+        background-color: #D32F2F;
+        color: white;
+    }
+
+    .delete-button:hover {
+        background-color: #C62828;
+    }
+
+    .back-button {
+        background-color: #00796B;
+        color: white;
+    }
+
+    .back-button:hover {
+        background-color: #004D40;
+    }
+
+    .job-details {
+        margin: 20px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="job-container">
+    <h1 class="job-title">{{ job.title }}</h1>
+    <h2 class="company-name">{{ job.recruiter.company_name }}</h2>
+
+    <div class="job-details">
+        <p><strong>Location:</strong> {{ job.location }}</p>
+        <p><strong>Job Type:</strong> {{ job.get_job_type_display }}</p>
+        <p><strong>Salary:</strong> {{ job.salary|default:"Not specified" }}</p>
+        <p><strong>Posted on:</strong> {{ job.posted_date|date:"F d, Y" }}</p>
+        <p><strong>Application Deadline:</strong> {{ job.application_deadline|date:"F d, Y" }}</p>
+    </div>
+
+    <h3>Description</h3>
+    <div class="job-description">{{ job.description|linebreaks }}</div>
+
+    
+
+    <div class="button-group">
+        {% if user.is_authenticated %}
+            {% if user.role == 'employee' %}
+                {% if already_applied %}
+                    <button class="apply-button" disabled>
+                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 19L2 12L4.5 9.5L9 14L20.5 2.5L23 5L9 19Z"/>
+                        </svg>
+                        </i> Already Applied
+                    </button>
+                {% else %}
+                    <a href="{% url 'apply_job' job.id %}" class="apply-button">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                        Apply Now
+                        
+                        
+                    </a>
+                {% endif %}
+            {% elif user.role == 'recruiter' and job.recruiter.user == user %}
+                <a href="{% url 'job_update' job.id %}" class="edit-button">
+                    <i class="fas fa-edit" style="margin-right: 5px;"></i> Edit Job
+                </a>
+                <a href="{% url 'job_delete' job.id %}" class="delete-button">
+                    <i class="fas fa-trash" style="margin-right: 5px;"></i> Delete Job
+                </a>
+            {% endif %}
+        {% else %}
+            <p class="mt-4">Please <a href="{% url 'login' %}">log in</a> to apply for this job.</p>
+        {% endif %}
+        
+        <!-- Back to Job Listings Button -->
+        <a href="{% url 'job_list' %}" class="back-button">
+            <i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Back to Job Listings
+        </a>
+    </div>
+    
+</div>
+{% endblock %}

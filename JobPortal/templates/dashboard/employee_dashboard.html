@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #FDECA1, #FBC2EB);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h2 {
+        color: #6A1B9A; /* Purple */
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2.5rem;
+        animation: fadeIn 1s;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .card {
+        background: #FFFFFF; /* White */
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        color: #6A1B9A; /* Purple */
+        margin-bottom: 10px;
+    }
+
+    .card-text {
+        color: #5D4037; /* Brown */
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        border-radius: 5px;
+        color: #fff; /* White */
+        text-decoration: none;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #ee1d69; /* Pink */
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:hover {
+        background-color: #C2185B; /* Darker Pink */
+    }
+
+    .no-applications {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #888; /* Light Gray */
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .col-md-4 {
+        flex: 1 1 calc(33.333% - 20px);
+        margin: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .col-md-4 {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <h2>Employee Dashboard</h2>
+    <div class="text-center m-3">
+        <a href="{% url 'job_list' %}" class="btn btn-primary">Browse Jobs</a>
+    </div>
+    <div class="row">
+        {% if applications %}
+            {% for application in applications %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ application.job.title }}</h5>
+                            <p class="card-text">{{ application.job.description|truncatewords:10 }}</p>
+                            <p class="card-text"><small class="text-muted">Company: {{ application.job.recruiter.company_name }}</small></p>
+                            <p class="card-text"><small class="text-muted">Applied on: {{ application.submitted_at|date:"F j, Y" }}</small></p>
+                            <p class="card-text"><small class="text-muted">Status: <strong>{{ application.get_status_display }}</strong></small></p>
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'job_detail' application.job.id %}" class="btn btn-primary">View Job</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info no-applications">
+                    You have not applied for any jobs yet.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+   
+</div>
+{% endblock %}

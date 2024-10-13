@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Details{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #FDECA1, #FBC2EB);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .application-info p {
+        margin: 10px 0;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555; /* Darker text color for better readability */
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        display: inline-block;
+        margin: 10px; /* Add margin for spacing between buttons */
+    }
+
+    .btn-primary {
+        background-color: #273a51; /* Blue */
+    }
+
+    .btn-danger {
+        background-color: #DC3545; /* Red */
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
+    }
+
+    .status-dropdown {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    select {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-width: 300px; /* Limit the width of the select */
+        transition: border-color 0.3s;
+    }
+
+    select:focus {
+        border-color: #007BFF; /* Highlight border on focus */
+        outline: none;
+    }
+</style>
+
+<div class="container">
+    <h2>Application Details</h2>
+
+    <div class="application-info">
+        <p><strong>Job Title:</strong> {{ application.job.title }}</p>
+        <p><strong>Company:</strong> {{ application.job.recruiter.company_name }}</p>
+        <p><strong>Submitted At:</strong> {{ application.submitted_at|date:"F d, Y" }}</p>
+        <p><strong>Status:</strong> {{ application.get_status_display }}</p>
+        <p><strong>Cover Letter:</strong> {{ application.cover_letter|linebreaks }}</p>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'application_list' %}" class="btn btn-primary">Back to My Applications</a>
+
+        {% if is_recruiter %}
+            <div class="status-dropdown">
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="status">Change Status:</label>
+                    <select name="status" id="status">
+                        <option value="under_review" {% if application.status == 'under_review' %}selected{% endif %}>Under Review</option>
+                        <option value="interview" {% if application.status == 'interview' %}selected{% endif %}>Interview</option>
+                        <option value="offered" {% if application.status == 'offered' %}selected{% endif %}>Offered</option>
+                        <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="btn btn-danger">Update Status</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications{% endblock %}
+
+{% block content %}
+
+
+
+<style>
+  
+
+        body {
+            background: linear-gradient(135deg, #FDECA1, #FBC2EB);
+            font-family: 'Arial', sans-serif;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensures it takes full height of the screen */
+            margin: 0; /* Remove any default body margin */
+        }
+    
+        h2 {
+            font-size: 2.5rem;
+            color: #333;
+            text-align: center;
+        }
+    
+        /* Center the table and make it responsive */
+        .table-container {
+            max-width: 1400px; /* Adjusted width to make it slightly larger */
+            margin: 0 auto; /* Centers the container horizontally */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            overflow-x: auto; /* Ensures the content is scrollable if the screen is too small */
+        }
+    
+        .table {
+            width: 100%; /* Ensure full width inside the container */
+            border-radius: 10px;
+        }
+    
+        .table th, .table td {
+            padding: 12px; /* Slightly increase padding */
+            text-align: center;
+        }
+    
+        .table th {
+            background-color: #FF6F61; /* Coral */
+            color: white;
+            min-width: 150px; /* Set minimum width to avoid content squeezing */
+        }
+    
+        .table tbody tr:hover {
+            background-color: #FFE0B2; /* Light Peach */
+        }
+    
+        /* Button Styles */
+        .btn-modern {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-block;
+            min-width: 120px; /* Ensure enough width for buttons */
+            text-align: center;
+        }
+    
+        /* Different colors for the action buttons */
+        .btn-view-job {
+            background-color: hsl(137, 61%, 49%); /* Green for View Job */
+            color: white;
+        }
+    
+        .btn-view-job:hover {
+            background-color: #d16e68; /* Darker Green */
+            transform: translateY(-2px);
+        }
+    
+        .btn-view-application {
+            background-color: #4ebda7; /* Blue for View Application */
+            color: white;
+        }
+    
+        .btn-view-application:hover {
+            background-color: #ac2a4d; /* Darker Blue */
+            transform: translateY(-2px);
+        }
+    
+        /* Status Labels */
+        .status-label {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+            min-width: 100px; /* Set minimum width to keep labels consistent */
+        }
+    
+        .submitted {
+            background-color: #9E9E9E; /* Gray for Submitted */
+        }
+    
+        .under-review {
+            background-color: #42A5F5; /* Blue for Under Review */
+        }
+    
+        .interview {
+            background-color: #FFB74D; /* Orange for Interview */
+        }
+    
+        .offered {
+            background-color: #66BB6A; /* Green for Offered */
+        }
+    
+        .rejected {
+            background-color: #EF5350; /* Red for Rejected */
+        }
+    
+        .alert {
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Enlarging the Actions column */
+     
+        .actions-col a{
+            margin: 2px;
+        }
+    
+        /* Pagination styles - Horizontally aligned */
+    /* Pagination styles - Buttons look */
+    .pagination-container {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center; /* Center horizontally */
+    }
+    
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+    }
+    
+    .pagination .page-link {
+        display: inline-block; /* Make the link behave like a button */
+        color: white; /* Set text color */
+        background-color: #4ebda7; /* Default background color */
+        border-radius: 50px;  /* Rounded buttons */
+        margin: 0 5px;  /* Spacing between pagination buttons */
+        padding: 10px 20px;  /* Button-like padding */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+        border: none; /* Remove borders */
+        font-weight: bold; /* Make text bold */
+        text-decoration: none; /* Remove underline */
+        transition: background-color 0.3s ease-in-out;
+        cursor: pointer; /* Change cursor to pointer */
+    }
+    
+    /* Active page button */
+    .pagination .page-item.active .page-link {
+        background-color: #FF6F61; /* Coral for active page */
+        color: white;
+        border-radius: 50px;
+        font-weight: bold;
+    }
+    
+    /* Hover effect */
+    .pagination .page-link:hover {
+        background-color: #ffab91; /* Lighter coral on hover */
+        color: white;
+    }
+    
+    /* First and last buttons */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        background-color: #f7b046; /* Soft peach for first and last links */
+        font-weight: bold;
+    }
+    
+    /* Disabled button */
+    .pagination .page-item.disabled .page-link {
+        background-color: #9E9E9E; /* Gray for disabled buttons */
+        color: white;
+        cursor: not-allowed; /* Disabled cursor */
+    }
+    
+    /* For smaller screens, make buttons fit better */
+    @media screen and (max-width: 768px) {
+        .pagination .page-link {
+            padding: 8px 15px; /* Reduce padding for smaller screens */
+        }
+    }
+    
+    
+        /* Media query for smaller screens */
+        @media screen and (max-width: 1200px) {
+            .table-container {
+                min-width: 100%; /* Adjust width for smaller screens */
+            }
+    
+            .table th, .table td {
+                padding: 8px; /* Adjust padding for smaller screens */
+            }
+    
+            .actions-col {
+                width: 220px; /* Adjust action column width for smaller screens */
+            }
+            
+        }
+    </style>
+    
+    <div class="container-fluid mt-5">
+        <h2 class="text-center mb-4">My Applications</h2>
+    
+        {% if page_obj %}
+        <div class="container-fluid  table-container"> <!-- Container to center and style the table -->
+            <table class="table table-hover mt-4">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in page_obj %}
+                        <tr>
+                            <td>{{ application.job.title }}</td>
+                            <td>{{ application.job.recruiter.company_name }}</td>
+                            <td>{{ application.submitted_at|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="status-label 
+                                    {% if application.status == 'submitted' %}
+                                        submitted
+                                    {% elif application.status == 'under_review' %}
+                                        under-review
+                                    {% elif application.status == 'interview' %}
+                                        interview
+                                    {% elif application.status == 'offered' %}
+                                        offered
+                                    {% elif application.status == 'rejected' %}
+                                        rejected
+                                    {% endif %}
+                                ">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="actions-col">
+                                <!-- View Job Button -->
+                                <a href="{% url 'job_detail' application.job.id %}" class="btn-modern btn-view-job">
+                                    Job
+                                </a>
+    
+                                {% if user.role == 'recruiter' %}
+                                    <!-- View Application Button -->
+                                    <a href="{% url 'application_detail' application.id %}" class="btn-modern btn-view-application">
+                                        Application
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+        <!-- Pagination Links -->
+        <div class="pagination-container mt-4 text-center">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-4">
+            <strong>You have not applied for any jobs yet.</strong>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

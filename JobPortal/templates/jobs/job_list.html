@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Listings{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #3c42b90e, #7ef4e0);
+    }
+
+    .content-wrapper {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .job-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #ffffff;
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .company-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #4b5563;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #ffffff;
+        margin-right: 12px;
+    }
+
+    .applied-button {
+        display: flex;
+        align-items: center;
+        background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .applied-button i {
+        margin-right: 5px;
+    }
+
+    .applied-button:hover {
+        background-color: #218838;
+    }
+
+    /* Dropdown styles */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        color: #333;
+        padding: 5px;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 120px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px;
+        font-size: 14px;
+        color: #333;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .job-content {
+        padding: 16px;
+    }
+
+    .job-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination-link {
+        margin: 0 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        background-color: #00796B; 
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .pagination-link:hover {
+        background-color: #004D40;
+    }
+
+ 
+    .search-bar {
+        width: 100%; /* Full width */
+        display: flex; /* Use flexbox for alignment */
+        border-radius: 25px; /* Rounded edges */
+        overflow: hidden; /* Ensure child elements respect rounded corners */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+        margin-bottom: 30px; /* Add margin below the search bar */
+    }
+
+    .search-input {
+        flex: 1; /* Allow input to take available space */
+        border: none; /* Remove default border */
+        padding: 12px 20px; /* Add padding for comfort */
+        font-size: 1rem; /* Increase font size for better readability */
+        border-radius: 25px; /* Round left corners */
+        outline: none; /* Remove outline on focus */
+        margin: 5px;
+    }
+
+    .search-button {
+        padding: 12px 20px; /* Consistent padding */
+        background-color: #FF6F61; /* Coral background */
+        color: white; /* White text */
+        border: none; /* Remove border */
+        cursor: pointer; /* Pointer cursor on hover */
+        font-size: 1rem; /* Increase font size */
+        border-radius: 25px; /* Round right corners */
+        transition: background-color 0.3s ease; /* Smooth background change */
+    }
+
+    .search-button:hover {
+        background-color: #d16e68; /* Darker coral on hover */
+    }
+</style>
+
+
+<div class="content-wrapper">
+    <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Job Listings</h1>
+    
+
+
+
+     <!-- Search Bar -->
+     <div class="search-bar">
+        <form method="GET" action="{% url 'job_search' %}">
+            <input type="text" name="company_name" placeholder="Company Name" class="search-input" value="{{ request.GET.company_name }}">
+            <input type="text" name="job_title" placeholder="Job Title" class="search-input" value="{{ request.GET.job_title }}">
+            <input type="text" name="location" placeholder="Location" class="search-input" value="{{ request.GET.location }}">
+            <input type="number" name="min_salary" placeholder="Min Salary" class="search-input" value="{{ request.GET.min_salary }}">
+            <input type="date" name="posted_after" class="search-input" value="{{ request.GET.posted_after }}">
+            <input type="date" name="deadline_before" class="search-input" value="{{ request.GET.deadline_before }}">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+
+
+    {% for job in page_obj %}
+        <div class="job-card shadow-md mb-6">
+            <div class="job-header">
+                <div class="flex items-center">
+                    <div class="company-avatar">
+                        {{ job.recruiter.company_name|first|upper }}
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold">{{ job.title }}</h2>
+                        <p class="text-sm text-gray-500">Company: {{ job.recruiter.company_name }}</p>
+                    </div>
+                </div>
+
+                <!-- For Employees: Show Applied Button -->
+                {% if request.user.is_authenticated and request.user.role == 'employee' and job.id in applied_job_ids %}
+                    <div class="applied-button">
+                        <i class="fas fa-check-circle"></i> Applied
+                    </div>
+                {% endif %}
+
+                <!-- For Recruiters: Show Dropdown Menu -->
+                {% if request.user.is_authenticated and request.user.role == 'recruiter' and job.recruiter.user == request.user %}
+                    <div class="dropdown">
+                        <button class="dropdown-button">
+                            &#x22EE; <!-- Three vertical dots -->
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="{% url 'job_update' job.id %}" class="dropdown-item">Edit</a>
+                            <a href="{% url 'job_delete' job.id %}" class="dropdown-item">Delete</a>
+                  
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="job-content">
+                <p class="text-gray-700 mb-4">{{ job.description|truncatewords:30 }}</p>
+            </div>
+            <div class="job-footer">
+                <div class="flex items-center text-gray-500">
+                    <span>Posted on: {{ job.posted_date|date:"F d, Y" }}</span>
+                </div>
+                <a href="{% url 'job_detail' job.id %}" class="text-blue-500 hover:text-blue-700 font-semibold">View Details</a>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center text-gray-600 italic">No jobs found.</p>
+    {% endfor %}
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        <div class="flex justify-center mt-8">
+            <nav aria-label="Page navigation">
+                <ul class="inline-flex -space-x-px">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page=1" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-l-lg" aria-label="First">First</a>
+                        </li>
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2" aria-label="Previous">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li>
+                                <span class="pagination-link z-10 bg-blue-100 border-blue-300 text-blue-600 px-3 py-2">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ num }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2" aria-label="Next">Next</a>
+                        </li>
+                        <li>
+                            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-r-lg" aria-label="Last">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Dropdown toggle script
+    document.querySelectorAll('.dropdown-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const dropdownMenu = this.nextElementSibling;
+            dropdownMenu.classList.toggle('show');
+        });
+    });
+
+    // Close dropdowns if clicking outside
+    window.addEventListener('click', function(e) {
+        if (!e.target.matches('.dropdown-button')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+</script>
+{% endblock %}

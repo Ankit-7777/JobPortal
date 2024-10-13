@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+<style>
+    .custom-gradient {
+        background: linear-gradient(135deg, #ffb74d, #ff6f61);
+    }
+    .error-message {
+        color: #D32F2F;
+        font-weight: bold;
+        font-size: 0.875rem;
+    }
+</style>
+    <div class="fixed inset-0 flex items-center justify-center custom-gradient bg-opacity-90">
+        <div class="w-full max-w-md bg-white p-10 rounded-lg shadow-lg border border-gray-300">
+            <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8">Log In</h1>
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="space-y-2">
+                    <label for="id_email" class="block text-gray-700 text-sm font-semibold">Email</label>
+                    <input type="email" name="email" id="id_email" 
+                           class="w-full border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-400 rounded-lg shadow-sm px-4 py-2 transition duration-300 ease-in-out" 
+                           placeholder="Enter your email" required>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="id_password" class="block text-gray-700 text-sm font-semibold">Password</label>
+                    <input type="password" name="password" id="id_password" 
+                           class="w-full border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-400 rounded-lg shadow-sm px-4 py-2 transition duration-300 ease-in-out" 
+                           placeholder="Enter your password" required>
+                </div>
+
+                {% if form.errors %}
+                    <div class="error-message text-center">
+                        {% if form.non_field_errors %}
+                            <p>{{ form.non_field_errors|first }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="flex justify-center">
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-300">
+                        Log In
+                    </button>
+                </div>
+            </form>
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Don't have an account? 
+                    <a href="{% url 'signup' %}" class="text-green-600 font-semibold hover:underline">Sign Up</a>
+                </p>
+                <p class="text-gray-600">
+                    <a href="{% url 'job_list' %}" class="text-green-600 font-semibold hover:underline">Back to Job Listings</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
