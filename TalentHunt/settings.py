@@ -88,13 +88,16 @@ WSGI_APPLICATION = 'TalentHunt.wsgi.application'
 #     }
 # }
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'JobPortalHub',
         'USER': 'root',
         'PASSWORD': 'semi@123',
-        'HOST': 'localhost',
+        'HOST':  'db',
         'PORT': '3306',
     }
 }

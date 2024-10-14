@@ -161,16 +161,33 @@ def application_list(request):
 @login_required
 def application_detail_view(request, application_id):
     application = get_object_or_404(Application, id=application_id)
-    if request.user != application.employee.user and request.user != application.job.recruiter.user:
+    is_employee = application.employee.user == request.user
+    is_recruiter = application.job.recruiter.user == request.user
+
+    if not is_employee and not is_recruiter:
         return render(request, '403.html')
 
-    if request.method == 'POST' and request.user.role == 'recruiter':
-        application.update_status(request.POST.get('status'), request.user)
-        send_application_status_update_notification.delay(application.employee.user.email, application.status, application.job.title, application.id)
-        messages.success(request, 'Application status updated successfully!')
-        return redirect('application_list')
+    if request.method == 'POST' and is_recruiter:
+        new_status = request.POST.get('status')
+        application.update_status(new_status, request.user) 
+        
+        # Send notification to the employee about the status update
+        employee_email = application.employee.user.email
+        job_title = application.job.title
+        
+        # Pass the application_id to the notification task
+        send_application_status_update_notification.delay(employee_email, new_status, job_title, application.id)
 
-    return render(request, 'applications/application_detail.html', {'application': application})
+        messages.success(request, 'Application status updated successfully!')
+        return redirect('application_list')  # Redirect to the application list after updating status
+
+
+    return render(request, 'applications/application_detail.html', {
+        'application': application,
+        'is_employee': is_employee,
+        'is_recruiter': is_recruiter,
+    })
+
 
 
 @login_required

@@ -1,0 +1,26 @@
+version: '3.12'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:5.7  # Use the MySQL image
+    environment:
+      MYSQL_DATABASE: JobPortalHub
+      MYSQL_ROOT_PASSWORD: semi@123
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
