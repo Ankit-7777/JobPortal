@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-(%g&_9c^&ngh@@%^dq#@rwq*z+p_-llfcytkm56f1^y=^4gi*^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -88,16 +88,13 @@ WSGI_APPLICATION = 'TalentHunt.wsgi.application'
 #     }
 # }
 
-import pymysql
-pymysql.install_as_MySQLdb()
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'JobPortalHub',
         'USER': 'root',
         'PASSWORD': 'semi@123',
-        'HOST':  'db',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
