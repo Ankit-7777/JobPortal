@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .table-header {
+        background-color: #ca9848;
+        color: white;
+    }
+
+    .table-header th {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .table-row:hover {
+        background-color: #e3f2fd;
+    }
+
+    .btn {
+        background-color: #19c0d2;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        display: inline-block;
+        box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+    }
+
+    .btn:hover {
+        background-color: #09ef97;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(13, 71, 161, 0.3);
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap; /* Allow items to wrap on small screens */
+    }
+
+    .search-input {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        width: 100%; /* Full width on small screens */
+        max-width: 300px; /* Limit max width */
+        margin-right: 0.5rem;
+        transition: border-color 0.3s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        
+    }
+
+    .search-button {
+        background-color: #507daa;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-button:hover {
+        background-color: #0869fb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(209, 117, 183, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .search-container {
+            flex-direction: column; /* Stack elements on smaller screens */
+            align-items: center; /* Center align items */
+        }
+
+        .search-input {
+            margin-bottom: 0.5rem; /* Add space between input and button */
+            margin-right: 0; /* Remove right margin on small screens */
+        }
+    }
+
+    @media (max-width: 640px) {
+        .table-header th, .table-row td {
+            padding: 0.5rem; /* Reduce padding for smaller screens */
+        }
+
+        .table-header th {
+            font-size: 0.75rem; /* Smaller font size for headers */
+        }
+
+        .table-row td {
+            font-size: 0.875rem; /* Smaller font size for cells */
+        }
+
+        .btn {
+            padding: 0.25rem 0.5rem; /* Smaller button padding */
+        }
+    }
+</style>
+
+<div class="max-w-6xl mx-auto px-4 py-6">
+    <h2 class="text-3xl font-bold mb-6 text-center">Employee List</h2>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search employees..." class="search-input" onkeyup="filterTable()">
+        <button class="search-button" onclick="filterTable()">Search</button>
+    </div>
+
+    <div class="overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="table-header">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs">#</th>
+                    <th class="px-6 py-3 text-left text-xs">Full Name</th>
+                    <th class="px-6 py-3 text-left text-xs">Email</th>
+                    <th class="px-6 py-3 text-left text-xs">Phone</th>
+                    <th class="px-6 py-3 text-left text-xs">Status</th>
+                    <th class="px-6 py-3 text-left text-xs">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="employeeTable">
+                {% for employee in page_obj %}
+                <tr class="table-row">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ employee.user.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ employee.user.email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ employee.phone }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="{% if employee.user.is_active %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ employee.user.is_active|yesno:"Active,Inactive" }}
+                        </span>
+                    </td>
+                    
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{% url 'employee_detail' employee.id %}" class="btn">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center px-6 py-4">No employees found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4" aria-label="Page navigation">
+        <ul class="inline-flex -space-x-px justify-center">
+            {% if page_obj.has_previous %}
+            <li>
+                <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l hover:bg-gray-100" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    &laquo;
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li>
+                <a class="px-3 py-2 text-sm font-medium {% if page_obj.number == num %}bg-gray-200 border border-gray-300 text-gray-700{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100{% endif %}" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li>
+                <a class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r hover:bg-gray-100" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    &raquo;
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script>
+    function filterTable() {
+        const searchInput = document.getElementById('search').value.toLowerCase();
+        const tableRows = document.querySelectorAll('#employeeTable tr');
+
+        tableRows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            let match = false;
+
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i]) {
+                    const cellText = cells[i].textContent || cells[i].innerText;
+                    if (cellText.toLowerCase().includes(searchInput)) {
+                        match = true;
+                        break;
+                    }
+                }
+            }
+
+            if (match) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+</script>
+
+{% endblock %}

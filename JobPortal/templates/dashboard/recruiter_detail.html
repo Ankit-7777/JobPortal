@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s; /* Smooth transition for hover effect */
+    }
+
+    .container:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #0d47a1;
+        font-size: 2rem; /* Increased heading size */
+    }
+
+    .list-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        padding: 15px;
+        border: 1px solid #e0e0e0; /* Subtle border for each item */
+        border-radius: 0.25rem; /* Rounded corners */
+        background-color: #f9f9f9; /* Light gray background for items */
+    }
+
+    .status-active {
+        color: green; /* Color for active status */
+        font-weight: bold;
+    }
+
+    .status-inactive {
+        color: red; /* Color for inactive status */
+        font-weight: bold;
+    }
+
+    .btn {
+        background-color: #1976d2;
+        color: white;
+        padding: 0.75rem 1.5rem; /* Increased padding */
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effects */
+        display: block;
+        text-align: center;
+        width: 100%;
+        margin-top: 1rem; /* Spacing above buttons */
+    }
+
+    .btn:hover {
+        background-color: #0d47a1;
+        transform: scale(1.05); /* Slightly enlarge on hover */
+    }
+
+    .form-group {
+        display: flex;
+        align-items: center; /* Center align items */
+        margin-bottom: 1rem; /* Space between form groups */
+    }
+
+    label {
+        margin-left: 10px; /* Space between checkbox and label */
+        font-weight: bold; /* Make the label bold */
+    }
+</style>
+
+<div class="container">
+    <h2>Recruiter Details</h2>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Full Name:</strong> {{ recruiter.user.name }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ recruiter.user.email }}</li>
+        <li class="list-group-item">
+            <strong>Status:</strong>
+            {% if recruiter.user.is_active %}
+                <span class="status-active">Active</span>
+            {% else %}
+                <span class="status-inactive">Inactive</span>
+            {% endif %}
+        </li>
+    </ul>
+
+    <!-- Form for changing recruiter status -->
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="is_active">Change Status:</label>
+            <input type="checkbox" name="is_active" id="is_active" {% if recruiter.user.is_active %}checked{% endif %}>
+            <label for="is_active">Active</label>
+        </div>
+        <button type="submit" class="btn">Update Status</button>
+    </form>
+
+    <a href="{% url 'recruiter_list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+
+{% endblock %}

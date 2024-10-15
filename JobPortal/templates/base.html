@@ -1,142 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}My Job Portal{% endblock %}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Job Portal{% endblock %}</title>
 
-
-         <!-- Load static files -->
+    <!-- Load static files -->
     {% load static %}
 
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-        <link rel="manifest" href="/site.webmanifest">
-        <link
-            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-            rel="stylesheet">
-    </head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #4CAF50;
+        }
+        .profile-dropdown {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .profile-dropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .profile-dropdown.hide {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
 
-    <body class="bg-gray-100">
-        <nav class="bg-white shadow-lg sticky top-0 z-10">
-            <div class="max-w-6xl mx-auto px-4">
-                <div class="flex justify-between items-center py-4">
-
-                    <!-- Left side of the navbar: Navigation Links -->
-                    <div class="flex items-center space-x-6">
-                        <a href="{% url 'job_list' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">Home</a>
-
-                        {% if user.is_authenticated %}
-                        {% if user.role == 'recruiter' %}
-                        <a href="{% url 'create_job' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">New
-                            Job Post</a>
-                        <a href="{% url 'job_list' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">My
-                            Job Posts</a>
-                        <a href="{% url 'application_list' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">Employee
-                            Applications</a>
-                        <a href="{% url 'recruiter_dashboard' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">Dashboard</a>
-                        {% elif user.role == 'employee' %}
-                        <a href="{% url 'employee_dashboard' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">Dashboard</a>
-                        <a href="{% url 'application_list' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">My
-                            Applications</a>
-                        {% endif %}
-                        {% endif %}
-                    </div>
-
-                    <!-- Right side of the navbar: Profile & Logout Button -->
-                    <div class="flex items-center space-x-4">
-                        {% if user.is_authenticated %}
-                        <div class="relative">
-                            <!-- Profile Icon Button -->
-                            <button
-                                class="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2 focus:outline-none"
-                                id="profile-menu-button">
-                                <span class="text-gray-600">{{ user.name }}</span>
-                                <img src="https://via.placeholder.com/40"
-                                    alt="Profile" class="w-8 h-8 rounded-full">
-                            </button>
-
-                            <!-- Dropdown Menu -->
-                            <div id="profile-dropdown"
-                                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
-                                {% if user.is_authenticated %}
-                                {% if user.role == 'recruiter' %}
-                                <!-- If the user is a recruiter, go to recruiter profile update -->
-                                <a href="{% url 'recruiter_profile_update' %}"
-                                    class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Profile</a>
-                                {% elif user.role == 'employee' %}
-                                <!-- If the user is an employee, go to employee profile update -->
-                                <a href="{% url 'employee_profile_update' %}"
-                                    class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Profile</a>
-                                {% endif %}
-                                <!-- Logout Link -->
-                                <a href="{% url 'logout' %}"
-                                    class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
-                                {% endif %}
-                            </div>
-
-                        </div>
-                        {% else %}
-                        <a href="{% url 'login' %}"
-                            class="text-gray-600 font-medium hover:text-green-500 transition duration-300">Log
-                            In</a>
-                        <a href="{% url 'signup' %}"
-                            class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-400 transition duration-300">Sign
-                            Up</a>
-                        {% endif %}
-                    </div>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                
+                <!-- Toggle Button for Mobile -->
+                <div class="lg:hidden">
+                    <button id="navbar-toggle" class="text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
                 </div>
-            </div>
-        </nav>
 
-        <!-- Main Content -->
-        <div class="max-w-4xl mx-auto mt-10 px-4">
-            {% block content %}
-            <h2 class="text-2xl font-semibold mb-4">Job Listings</h2>
-            <div class="bg-white shadow-md rounded-lg p-6">
-                {% for job in jobs %}
-                <div class="border-b border-gray-200 pb-4 mb-4">
-                    <h3 class="text-xl font-bold">{{ job.title }}</h3>
-                    <p class="text-gray-600">{{ job.description }}</p>
-                    <p class="text-gray-500">Company: {{ job.company }}</p>
-                    <p class="text-gray-500">Location: {{ job.location }}</p>
-                    {% if user.is_authenticated and user.role == 'employee' %}
-                    <a href="{% url 'apply_job' job.id %}"
-                        class="bg-green-500 text-white py-2 px-4 rounded-lg mt-2 inline-block hover:bg-green-400 transition duration-300">Apply</a>
+                <!-- Navigation Links -->
+                <div class="hidden lg:flex items-center space-x-6" id="navbar-links">
+                    <a href="{% url 'job_list' %}" class="nav-link text-gray-600 font-medium">Home</a>
+
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'superadmin' %}
+                            <a href="{% url 'employee_list' %}" class="nav-link">Employee List</a>
+                            <a href="{% url 'recruiter_list' %}" class="nav-link">Recruiter List</a>
+                            <a href="{% url 'superadmin_dashboard' %}" class="nav-link">Dashboard</a>
+                        {% endif %}
+                        
+                        {% if user.role == 'recruiter' %}
+                            <a href="{% url 'create_job' %}" class="nav-link">New Job Post</a>
+                            <a href="{% url 'job_list' %}" class="nav-link">My Job Posts</a>
+                            <a href="{% url 'application_list' %}" class="nav-link">Employee Applications</a>
+                            <a href="{% url 'recruiter_dashboard' %}" class="nav-link">Dashboard</a>
+                        {% elif user.role == 'employee' %}
+                            <a href="{% url 'employee_dashboard' %}" class="nav-link">Dashboard</a>
+                            <a href="{% url 'application_list' %}" class="nav-link">My Applications</a>
+                        {% endif %}
                     {% endif %}
                 </div>
-                {% empty %}
-                <p class="text-gray-500">No job listings available at the
-                    moment.</p>
-                {% endfor %}
-            </div>
-            {% endblock %}
-        </div>
 
-        <script>
+                <!-- Profile & Logout Button -->
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
+                        <div class="relative">
+                            <button class="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2 focus:outline-none" id="profile-menu-button">
+                                <span class="text-gray-600">{{ user.name }}</span>
+                                <img src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full">
+                            </button>
+
+                            <div id="profile-dropdown" class="profile-dropdown hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
+                                {% if user.role == 'recruiter' %}
+                                    <a href="{% url 'recruiter_profile_update' %}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Profile</a>
+                                {% elif user.role == 'employee' %}
+                                    <a href="{% url 'employee_profile_update' %}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Profile</a>
+                                {% endif %}
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link">Log In</a>
+                        <a href="{% url 'signup' %}" class="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-400 transition duration-300">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mobile Menu Links -->
+            <div class="hidden lg:hidden flex flex-col space-y-4 mt-4" id="navbar-mobile">
+                <a href="{% url 'job_list' %}" class="nav-link text-gray-600 font-medium">Home</a>
+
+                {% if user.is_authenticated %}
+                    {% if user.role == 'superadmin' %}
+                        <a href="{% url 'employee_list' %}" class="nav-link">Employee List</a>
+                        <a href="{% url 'recruiter_list' %}" class="nav-link">Recruiter List</a>
+                        <a href="{% url 'job_list' %}" class="nav-link">Job Post List</a>
+                        <a href="{% url 'superadmin_dashboard' %}" class="nav-link">Admin Dashboard</a>
+                    {% endif %}
+
+                    {% if user.role == 'recruiter' %}
+                        <a href="{% url 'create_job' %}" class="nav-link">New Job Post</a>
+                        <a href="{% url 'job_list' %}" class="nav-link">My Job Posts</a>
+                        <a href="{% url 'application_list' %}" class="nav-link">Employee Applications</a>
+                        <a href="{% url 'recruiter_dashboard' %}" class="nav-link">Dashboard</a>
+                    {% elif user.role == 'employee' %}
+                        <a href="{% url 'employee_dashboard' %}" class="nav-link">Dashboard</a>
+                        <a href="{% url 'application_list' %}" class="nav-link">My Applications</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto mt-10 px-4 sm:px-6 lg:px-8">
+        {% block content %}
+        <!-- Your content here -->
+        {% endblock %}
+    </div>
+
+    <script>
         // Toggle profile dropdown visibility
         document.getElementById('profile-menu-button').addEventListener('click', function () {
             const dropdown = document.getElementById('profile-dropdown');
             dropdown.classList.toggle('hidden');
         });
 
-        // Close dropdown if clicking outside
-        window.addEventListener('click', function (event) {
-            const button = document.getElementById('profile-menu-button');
-            const dropdown = document.getElementById('profile-dropdown');
-
-            if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.add('hidden');
-            }
+        // Toggle mobile navbar visibility
+        document.getElementById('navbar-toggle').addEventListener('click', function () {
+            const mobileMenu = document.getElementById('navbar-mobile');
+            mobileMenu.classList.toggle('hidden');
         });
     </script>
-    </body>
+</body>
 </html>

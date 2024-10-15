@@ -39,7 +39,12 @@ urlpatterns = [
     path('jobs/create/', create_job_view, name='create_job'),
     path('jobs/<int:job_id>/update/', update_job_view, name='job_update'),
     path('jobs/<int:job_id>/delete/', delete_job_view, name='job_delete'),
-    # path('applications/<int:application_id>/update-status/', update_application_status_view, name='update_application_status'),
+    
+    path('superadmin/dashboard/', views.superadmin_dashboard_view, name='superadmin_dashboard'),  # Add superadmin URL
+    path('recruiters/', views.recruiter_list_view, name='recruiter_list'),
+    path('employees/', views.employee_list_view, name='employee_list'),
+    path('employees/<int:employee_id>/', views.employee_detail_view, name='employee_detail'),
+    path('recruiters/<int:recruiter_id>/', views.recruiter_detail_view, name='recruiter_detail'),
     
     path('logout/', views.user_logout, name='logout'),
     

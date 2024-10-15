@@ -5,7 +5,7 @@ from django.contrib.auth import logout, login, authenticate
 from .forms import SignupForm, EmployeeForm, RecruiterForm, JobForm, ApplicationForm
 from .models import Employee, Recruiter, Job, Application
 from django.core.paginator import Paginator
-from .tasks import send_application_notification, send_application_status_update_notification
+from .tasks import send_application_notification, send_application_status_update_notification, send_welcome_email
 
 
 def signup_view(request):
@@ -14,6 +14,9 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+
+            send_welcome_email.delay(user.email, user.name, user.role)
+
             return redirect('recruiter_profile_update' if user.role == 'recruiter' else 'employee_profile_update')
     else:
         form = SignupForm()
@@ -47,9 +50,128 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user:
             login(request, user)
-            return redirect('recruiter_dashboard' if user.role == 'recruiter' else 'employee_dashboard')
+            if user.role == 'recruiter':
+                return redirect('recruiter_dashboard')
+            elif user.role == 'employee':
+                return redirect('employee_dashboard')
+            elif user.role == 'superadmin':
+                return redirect('superadmin_dashboard') 
         messages.error(request, 'Invalid email or password.')
     return render(request, 'userflow/login.html')
+
+
+
+@login_required
+def superadmin_dashboard_view(request):
+    if request.user.role != 'superadmin':
+        return redirect('login')  # Redirect if not a superadmin
+
+    # Count all users based on roles
+    employees_count = Employee.objects.count()
+    recruiters_count = Recruiter.objects.count()
+    jobs_count = Job.objects.count()
+
+    # Assuming there is a Guest model
+    # guest_users_count = Guest.objects.count()
+
+    # Active and deactivated recruiters and employees
+    active_recruiters_count = Recruiter.objects.filter(user__is_active=True).count()
+    deactivated_recruiters_count = Recruiter.objects.filter(user__is_active=False).count()
+
+    active_employees_count = Employee.objects.filter(user__is_active=True).count()
+    deactivated_employees_count = Employee.objects.filter(user__is_active=False).count()
+
+    # Job posts (assuming jobs have active/deactivated statuses)
+    active_jobs_count = Job.objects.filter(is_active=True).count()
+    deactivated_jobs_count = Job.objects.filter(is_active=False).count()
+
+    # Render superadmin dashboard
+    return render(request, 'dashboard/superadmin_dashboard.html', {
+        'employees_count': employees_count,
+        'recruiters_count': recruiters_count,
+        'jobs_count': jobs_count,
+        # 'guest_users_count': guest_users_count,
+        'active_recruiters_count': active_recruiters_count,
+        'deactivated_recruiters_count': deactivated_recruiters_count,
+        'active_employees_count': active_employees_count,
+        'deactivated_employees_count': deactivated_employees_count,
+        'active_jobs_count': active_jobs_count,
+        'deactivated_jobs_count': deactivated_jobs_count,
+        'message': 'Welcome to the Superadmin Dashboard!',
+    })
+
+
+
+@login_required
+def recruiter_list_view(request):
+    if request.user.role != 'superadmin':
+        messages.error(request, 'You do not have permission to view this page.')
+        return redirect('login')
+
+    recruiters = Recruiter.objects.all() 
+    paginator = Paginator(recruiters, 10) 
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'dashboard/recruiter_list.html', {'page_obj': page_obj})
+
+
+@login_required
+def employee_list_view(request):
+    if request.user.role != 'superadmin':
+        messages.error(request, 'You do not have permission to view this page.')
+        return redirect('login') 
+
+    employees = Employee.objects.all() 
+    paginator = Paginator(employees, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'dashboard/employee_list.html', {'page_obj': page_obj})
+
+
+
+
+
+
+@login_required
+def recruiter_detail_view(request, recruiter_id):
+    recruiter = get_object_or_404(Recruiter, id=recruiter_id)
+
+    # Only superadmins can view recruiter details
+    if request.user.role != 'superadmin':
+        messages.error(request, 'You do not have permission to view this page.')
+        return render(request, '403.html')
+
+    if request.method == 'POST':
+        # Directly update the 'is_active' status based on checkbox
+        is_active = request.POST.get('is_active') == 'on'  # Checkbox value
+        recruiter.user.is_active = is_active  # Update the active status of the recruiter
+        recruiter.user.save()  # Save the changes
+        messages.success(request, 'Recruiter status updated successfully.')
+        return redirect('recruiter_detail', recruiter_id=recruiter.id)
+
+    return render(request, 'dashboard/recruiter_detail.html', {'recruiter': recruiter})
+
+
+
+
+@login_required
+def employee_detail_view(request, employee_id):
+    employee = get_object_or_404(Employee, id=employee_id)
+
+    # Only superadmins can view employee details
+    if request.user.role != 'superadmin':
+        messages.error(request, 'You do not have permission to view this page.')
+        return render(request, '403.html')
+
+    if request.method == 'POST':
+        # Check if the 'is_active' checkbox was submitted
+        is_active = request.POST.get('is_active') == 'on'  # Checkbox value
+        employee.user.is_active = is_active  # Update the active status
+        employee.user.save()  # Save the changes
+        messages.success(request, 'Employee status updated successfully.')
+        return redirect('employee_detail', employee_id=employee.id)
+
+    return render(request, 'dashboard/employee_detail.html', {'employee': employee})
 
 
 @login_required

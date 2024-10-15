@@ -1,0 +1,176 @@
+<!-- dashboard/superadmin_dashboard.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="dashboard-title">{{ message }}</h1>
+    <div class="dashboard-cards">
+        <div class="card card-primary">
+            <div class="card-header">Total Employees</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ employees_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">Total Recruiters</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ recruiters_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-warning">
+            <div class="card-header">Total Jobs Posted</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ jobs_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">Active Recruiters</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ active_recruiters_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-danger">
+            <div class="card-header">Deactivated Recruiters</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ deactivated_recruiters_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">Active Employees</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ active_employees_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-danger">
+            <div class="card-header">Deactivated Employees</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ deactivated_employees_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-warning">
+            <div class="card-header">Active Jobs</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ active_jobs_count }}</h5>
+            </div>
+        </div>
+        <div class="card card-danger">
+            <div class="card-header">Deactivated Jobs</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ deactivated_jobs_count }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #FFE0B2, #A5D6A7);
+        font-family: 'Arial', sans-serif;
+    }
+
+    .dashboard-title {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #3E2723; /* Dark Brown */
+        margin-bottom: 30px;
+    }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 0 10px; /* Reduced padding for smaller screens */
+    }
+
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .card-header {
+        background-color: #1e2a37; /* Blue */
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        padding: 15px 0;
+    }
+
+    .card-body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border-radius: 0 0 15px 15px;
+        padding: 20px 0;
+    }
+
+    .card-title {
+        font-size: 2.5rem;
+        color: #4A90E2; /* Blue */
+        margin: 0;
+    }
+
+    .card-primary {
+        background-color: #FFE0B2; /* Light Orange */
+    }
+
+    .card-success {
+        background-color: #A5D6A7; /* Light Green */
+    }
+
+    .card-warning {
+        background-color: #f6cd8f; /* Peach */
+    }
+
+    .card-danger {
+        background-color: #ca9090; /* Light Coral */
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+        }
+
+        .card {
+            padding: 15px; /* Less padding for smaller screens */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .dashboard-cards {
+            padding: 0 5px; /* Further reduced padding for very small screens */
+        }
+
+        .card-header {
+            font-size: 1rem; /* Smaller font size for card header */
+        }
+    }
+</style>
+{% endblock %}
