@@ -4,6 +4,41 @@ from django.conf import settings
 from celery import shared_task
 import logging
 
+logger = logging.getLogger(__name__)
+
+@shared_task
+def send_welcome_email(user_email, user_name, user_role):
+    subject = 'Welcome to Our Platform'
+    text_message = f'Hi {user_name}, thank you for signing up as a {user_role}! We are excited to have you on board.'
+    
+    # HTML version of the email
+    html_message = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; color: #333;">
+        <h2>Welcome, {user_name}!</h2>
+        <p>Thank you for signing up as a <strong>{user_role}</strong>. We are excited to have you on board!</p>
+        <p>Feel free to explore our platform.</p>
+        <p>Best Regards,<br>Your Job Portal Team</p>
+    </body>
+    </html>
+    """
+
+    try:
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_message,  # Plain text message
+            from_email=settings.EMAIL_HOST_USER,
+            to=[user_email]
+        )
+        
+        # Attach the HTML content
+        email.attach_alternative(html_message, "text/html")
+        email.send()
+
+        logger.info(f'Welcome email sent successfully to {user_email}')
+    except Exception as e:
+        logger.error(f'Failed to send welcome email to {user_email}: {str(e)}')
+
 
 
 

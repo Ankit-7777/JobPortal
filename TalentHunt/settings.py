@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_extensions',
     'JobPortal',
     'corsheaders',
     'djoser',
@@ -91,7 +92,7 @@ WSGI_APPLICATION = 'TalentHunt.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'JobPortalHub',
+        'NAME': 'JobPortal',
         'USER': 'root',
         'PASSWORD': 'semi@123',
         'HOST': 'localhost',

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Recruiter List</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover shadow-sm rounded" style="width: 100%;">
+            <thead class="thead-light">
+                <tr>
+                    <th>#</th>
+                    <th>Company Name</th>
+                    <th>Website</th>
+                    <th>Contact Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recruiter in page_obj %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ recruiter.company_name }}</td>
+                    <td>
+                        <a href="{{ recruiter.website }}" target="_blank" class="text-decoration-none text-primary">{{ recruiter.website }}</a>
+                    </td>
+                    <td>
+                        <a href="mailto:{{ recruiter.user.email }}" class="text-decoration-none text-primary">{{ recruiter.user.email }}</a>
+                    </td>
+                    <td>
+                        <span class="{% if recruiter.user.is_active %}badge bg-success{% else %}badge bg-danger{% endif %}">
+                            {{ recruiter.user.is_active|yesno:"Active,Inactive" }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'recruiter_detail' recruiter.id %}" class="btn btn-primary btn-sm">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No recruiters found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        <div class="flex justify-center mt-8 mb-6">
+            <nav aria-label="Page navigation">
+                <ul class="inline-flex -space-x-px">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page=1" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-l-lg" aria-label="First">First</a>
+                        </li>
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2" aria-label="Previous">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li>
+                                <span class="pagination-link z-10 bg-blue-100 border-blue-300 text-blue-600 px-3 py-2">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?page={{ num }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2" aria-label="Next">Next</a>
+                        </li>
+                        <li>
+                            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link bg-white text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-r-lg" aria-label="Last">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    body {
+        background-color: #f0f4f8;
+        font-family: 'Arial', sans-serif;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        animation: fadeInDown 0.5s ease;
+    }
+
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: #fff;
+        border: none;
+    }
+
+    .table th {
+        background-color: #4e54c8;
+        color: #fff;
+        position: relative;
+        padding: 0.75rem;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+        padding: 0.75rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .pagination-link {
+        margin: 0 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        background-color: #6c340f;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    
+    .pagination-link:hover {
+        background-color: #422e04;
+    }
+    
+    .pagination-link[aria-disabled="true"] {
+        pointer-events: none;
+        background-color: #b0bec5;
+        color: #ffffff;
+    }
+    
+    .pagination-link.z-10 {
+        background-color: #785118;
+        color: white;
+    }
+    
+    .pagination-link.z-10:hover {
+        background-color: #00796B;
+    }
+
+    @media (max-width: 768px) {
+        h2 {
+            font-size: 1.8rem;
+        }
+
+        .table {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .table td, .table th {
+            padding: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        .pagination-link {
+            padding: 8px 12px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+
+    @keyframes fadeInDown {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

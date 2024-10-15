@@ -106,6 +106,7 @@ class Job(models.Model):
     salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, validators=[MinValueValidator(0)])
     posted_date = models.DateTimeField(auto_now_add=True)
     application_deadline = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.title} at {self.recruiter.company_name}"
@@ -142,13 +143,10 @@ class Application(models.Model):
         ('offered', 'Offered'),
         ('rejected', 'Rejected'),
     ], default='submitted')
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.employee.user.email} applied for {self.job.title}"
-
-    # Method to update application status
-    
-    
     def update_status(self, new_status, user=None):
         if new_status in dict(Application.status.field.choices):
             self.status = new_status
