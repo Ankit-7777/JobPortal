@@ -1,44 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apply for Job</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Apply for Job</h1>
-        <div id="error-message" class="alert alert-danger d-none"></div> <!-- Error message div -->
-        <form id="application-form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" id="job-id" value="{{ job.id }}">
+{% extends 'base.html' %}
+
+{% block title %} Apply For Job {% endblock %}
+
+{% block content %}
+<div class="container mx-auto my-10">
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">Apply for Job</h1>
+        
+        <!-- Form starts here -->
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            {{ form.non_field_errors }}
             
-            <div class="form-group mb-3">
-                <label for="phone-number">Phone Number</label>
-                <input type="text" class="form-control" id="phone-number" name="phone_number" 
-                       value="{{ form.phone_number.value|default:'' }}" required>
+            <!-- Phone Number -->
+            <div class="mb-6">
+                <label for="phone-number" class="block text-lg font-semibold text-indigo-800">Phone Number</label>
+                {{ form.phone_number.errors }}
+                <input type="text" name="phone_number" id="phone-number" 
+                       class="border border-indigo-300 rounded-lg p-3 w-full transition duration-300 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                       value="{{ form.phone_number.value|default:'' }}" placeholder="Enter your phone number" required>
             </div>
 
-            <div class="form-group mb-3">
-                <label for="resume">Resume (Optional)</label>
-                <input type="file" class="form-control" id="resume" name="resume">
+            <!-- Resume Upload -->
+            <div class="mb-6">
+                <label for="resume" class="block text-lg font-semibold text-indigo-800">Upload Resume (Optional)</label>
+                {{ form.resume.errors }}
+                <input type="file" name="resume" id="resume" 
+                       class="border border-indigo-300 rounded-lg p-3 w-full transition duration-300 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 {% if form.resume.value %}
-                    <small class="form-text text-muted">Current Resume: {{ form.resume.value }}</small>
+                    <small class="text-gray-500">Current Resume: {{ form.resume.value }}</small>
                 {% endif %}
             </div>
-            
-            <div class="form-group mb-3">
-                <label for="cover-letter">Cover Letter (Optional)</label>
-                <textarea class="form-control" id="cover-letter" name="cover_letter" rows="4" required>{{ form.cover_letter.value }}</textarea>
+
+            <!-- Cover Letter -->
+            <div class="mb-6">
+                <label for="cover-letter" class="block text-lg font-semibold text-indigo-800">Cover Letter (Optional)</label>
+                {{ form.cover_letter.errors }}
+                <textarea name="cover_letter" id="cover-letter" rows="4" 
+                          class="border border-indigo-300 rounded-lg p-3 w-full transition duration-300 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                          placeholder="Write your cover letter here...">{{ form.cover_letter.value }}</textarea>
             </div>
-            
-            <button type="submit" class="btn btn-primary">Submit Application</button>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" 
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-opacity-50">
+                    Submit Application
+                </button>
+            </div>
         </form>
     </div>
+</div>
 
-    <script>
-        // You can keep your JavaScript logic if needed for form submission
-    </script>
-</body>
-</html>
+<style>
+    /* Optional Styling for Smooth Transitions */
+    textarea, input[type="text"], input[type="file"] {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<style>
+    body {
+        background-color: #f7fafc;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #4c51bf; /* Indigo for title */
+    }
+
+    .card {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        animation: zoomIn 0.5s ease-out;
+    }
+
+    .form-control {
+        padding: 1rem;
+        border: 2px solid #ced4da;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #4c51bf; /* Indigo border on focus */
+        box-shadow: 0 0 8px rgba(76, 81, 191, 0.5);
+    }
+
+    .btn {
+        background-color: #667eea; /* Indigo for buttons */
+        color: #fff;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #5a67d8;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+    }
+
+    .container-fluid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* Button Animation */
+    .btn-animate {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    /* Animation */
+    @keyframes zoomIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        .form-control {
+            font-size: 1rem;
+        }
+
+        button {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}

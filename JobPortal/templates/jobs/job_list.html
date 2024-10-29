@@ -69,7 +69,6 @@
         background-color: #218838;
     }
 
-    /* Dropdown styles */
     .dropdown {
         position: relative;
         display: inline-block;
@@ -112,6 +111,10 @@
         background-color: #f0f0f0;
     }
 
+    .job-card:hover h2 {
+        color: #00796B;
+    }
+
     .job-content {
         padding: 16px;
     }
@@ -133,7 +136,7 @@
         margin: 0 5px;
         padding: 10px 15px;
         border-radius: 5px;
-        background-color: #00796B; 
+        background-color: #00796B;
         color: white;
         text-decoration: none;
         transition: background-color 0.3s;
@@ -143,62 +146,87 @@
         background-color: #004D40;
     }
 
- 
+    .pagination-link.z-10 {
+        font-weight: bold;
+        color: white;
+    }
+
     .search-bar {
-        width: 100%; /* Full width */
-        display: flex; /* Use flexbox for alignment */
-        border-radius: 25px; /* Rounded edges */
-        overflow: hidden; /* Ensure child elements respect rounded corners */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-        margin-bottom: 30px; /* Add margin below the search bar */
+        width: 100%;
+        display: flex;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
     }
 
     .search-input {
-        flex: 1; /* Allow input to take available space */
-        border: none; /* Remove default border */
-        padding: 12px 20px; /* Add padding for comfort */
-        font-size: 1rem; /* Increase font size for better readability */
-        border-radius: 25px; /* Round left corners */
-        outline: none; /* Remove outline on focus */
+        flex: 1;
+        border: none;
+        padding: 12px 20px;
+        font-size: 1rem;
+        border-radius: 25px;
+        outline: none;
         margin: 5px;
     }
 
     .search-button {
-        padding: 12px 20px; /* Consistent padding */
-        background-color: #FF6F61; /* Coral background */
-        color: white; /* White text */
-        border: none; /* Remove border */
-        cursor: pointer; /* Pointer cursor on hover */
-        font-size: 1rem; /* Increase font size */
-        border-radius: 25px; /* Round right corners */
-        transition: background-color 0.3s ease; /* Smooth background change */
+        padding: 12px 20px;
+        background-color: #FF6F61;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        border-radius: 25px;
+        transition: background-color 0.3s ease;
     }
 
     .search-button:hover {
-        background-color: #d16e68; /* Darker coral on hover */
+        background-color: #d16e68;
     }
-</style>
 
+    .suggestion-list {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        position: absolute;
+        z-index: 1000;
+        background: white;
+    }
+
+    .suggestion-item {
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    .suggestion-item:hover {
+        background: #f0f0f0;
+    }   
+</style>
 
 <div class="content-wrapper">
     <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Job Listings</h1>
-    
 
-
-
-     <!-- Search Bar -->
-     <div class="search-bar">
+    <div class="search-bar">
         <form method="GET" action="{% url 'job_search' %}">
             <input type="text" name="company_name" placeholder="Company Name" class="search-input" value="{{ request.GET.company_name }}">
-            <input type="text" name="job_title" placeholder="Job Title" class="search-input" value="{{ request.GET.job_title }}">
+            <input type="text" name="job_title" id="job_title" placeholder="Job Title" class="search-input" value="{{ request.GET.job_title }}">
+            <div class="suggestion-list" id="suggestion-list" style="display: none;"></div>
             <input type="text" name="location" placeholder="Location" class="search-input" value="{{ request.GET.location }}">
             <input type="number" name="min_salary" placeholder="Min Salary" class="search-input" value="{{ request.GET.min_salary }}">
             <input type="date" name="posted_after" class="search-input" value="{{ request.GET.posted_after }}">
             <input type="date" name="deadline_before" class="search-input" value="{{ request.GET.deadline_before }}">
+            <select name="job_type" class="search-input">
+                <option value="">Job Type</option>
+                <option value="full_time">Full-time</option>
+                <option value="part_time">Part-time</option>
+                <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+            </select>
             <button type="submit" class="search-button">Search</button>
         </form>
     </div>
-
 
     {% for job in page_obj %}
         <div class="job-card shadow-md mb-6">
@@ -210,26 +238,23 @@
                     <div>
                         <h2 class="text-lg font-semibold">{{ job.title }}</h2>
                         <p class="text-sm text-gray-500">Company: {{ job.recruiter.company_name }}</p>
+                        <span style="color: black;">Location: </span>
+                        <span style="color: #0cf743; font-weight: bold;">{{ job.location }}</span>
                     </div>
                 </div>
 
-                <!-- For Employees: Show Applied Button -->
                 {% if request.user.is_authenticated and request.user.role == 'employee' and job.id in applied_job_ids %}
                     <div class="applied-button">
                         <i class="fas fa-check-circle"></i> Applied
                     </div>
                 {% endif %}
 
-                <!-- For Recruiters: Show Dropdown Menu -->
                 {% if request.user.is_authenticated and request.user.role == 'recruiter' and job.recruiter.user == request.user %}
                     <div class="dropdown">
-                        <button class="dropdown-button">
-                            &#x22EE; <!-- Three vertical dots -->
-                        </button>
+                        <button class="dropdown-button">&#x22EE;</button>
                         <div class="dropdown-menu">
                             <a href="{% url 'job_update' job.id %}" class="dropdown-item">Edit</a>
                             <a href="{% url 'job_delete' job.id %}" class="dropdown-item">Delete</a>
-                  
                         </div>
                     </div>
                 {% endif %}
@@ -241,6 +266,7 @@
             <div class="job-footer">
                 <div class="flex items-center text-gray-500">
                     <span>Posted on: {{ job.posted_date|date:"F d, Y" }}</span>
+                    <span class="ml-4">Deadline: {{ job.application_deadline|date:"F d, Y" }}</span>
                 </div>
                 <a href="{% url 'job_detail' job.id %}" class="text-blue-500 hover:text-blue-700 font-semibold">View Details</a>
             </div>
@@ -288,20 +314,27 @@
         </div>
     </div>
     {% endif %}
+
+
 </div>
 
 <script>
-    // Dropdown toggle script
     document.querySelectorAll('.dropdown-button').forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
             const dropdownMenu = this.nextElementSibling;
             dropdownMenu.classList.toggle('show');
         });
     });
 
-    // Close dropdowns if clicking outside
-    window.addEventListener('click', function(e) {
-        if (!e.target.matches('.dropdown-button')) {
+    window.addEventListener('click', function () {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    });
+
+    window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
